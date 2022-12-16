@@ -3,9 +3,9 @@ import { StyleSheet, Text, View } from "react-native";
 import colors from "../Colors";
 
 const TodoList = ({ list }) => {
-const completedCount = list.todos.filter(todo => todo.completed).length;
-const remainingCount = list.todos.length - completedCount;
-    return (
+  const completedCount = list.todos.filter((todo) => todo.completed).length;
+  const remainingCount = list.todos.length - completedCount;
+  return (
     <View style={[styles.listContainer, { backgroundColor: list.color }]}>
       <Text style={styles.listTitle} numberOfLines={1}>
         {list.name}
@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginHorizontal: 12,
     alignItems: "center",
-    width: 200
+    width: 200,
   },
   listTitle: {
     fontSize: 24,
