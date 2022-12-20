@@ -1,15 +1,35 @@
 import React from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, TouchableOpacity, FlatList } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, Modal } from "react-native";
 import TodoList from "./components/TodoList";
+import AddListModal from "./components/AddListModal";
 import { AntDesign } from "@expo/vector-icons";
 import colors from "./Colors";
 import mockData from "./mockData";
 
 export default class App extends React.Component {
+  state = {
+    addTodoVisible: false,
+  };
+
+  toggleAddTodoVisible = () => {
+    this.setState({ addTodoVisible: !this.state.addTodoVisible });
+  };
+
+  renderTodoList = (todoList) => {
+    return <TodoList list={todoList} />;
+  };
+
   render() {
     return (
       <View style={styles.container}>
+        <Modal
+          visible={this.state.addTodoVisible}
+          animationType="slide"
+          onRequestClose={() => this.toggleAddTodoVisible()}
+        >
+          <AddListModal closeModal={() => this.toggleAddTodoVisible()} />
+        </Modal>
         <StatusBar style="auto" />
 
         <View style={{ flexDirection: "row" }}>
@@ -21,7 +41,7 @@ export default class App extends React.Component {
         </View>
 
         <View style={{ marginVertical: 48 }}>
-          <TouchableOpacity style={styles.addList}>
+          <TouchableOpacity style={styles.addList} onPress={() => this.toggleAddTodoVisible()}>
             <AntDesign name="plus" size={16} color={colors.pink} />
           </TouchableOpacity>
           <Text style={styles.add}>Add List</Text>
@@ -33,7 +53,7 @@ export default class App extends React.Component {
             keyExtractor={(item) => item.name}
             horizontal={true}
             showHorizontalScrollIndicator={false}
-            renderItem={({ item }) => <TodoList list={item} />}
+            renderItem={({ item }) => this.renderTodoList(item)}
           />
         </View>
       </View>

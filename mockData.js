@@ -5,7 +5,7 @@ export default mockData = [
          todos: [
             {
                 title: "book a flight",
-                completed: false,
+                completed: true,
             },
             {
                 title: "passport check",
@@ -17,7 +17,7 @@ export default mockData = [
             },
             {
                 title: "get your shit together",
-                completed: false,
+                completed: true,
             },
          ], 
     },
