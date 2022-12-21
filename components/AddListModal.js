@@ -24,13 +24,10 @@ export default class AddListModal extends Component {
 
   addTodoList = () => {
     const { name, color } = this.state;
-    mockData.push({
-      name,
-      color,
-      todos: [],
-    });
+    const list = { name, color };
 
-    this.setState({name: ""});
+    this.props.addList(list);
+    this.setState({ name: "" });
     this.props.closeModal();
   };
 

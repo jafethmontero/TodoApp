@@ -10,6 +10,8 @@ import mockData from "./mockData";
 export default class App extends React.Component {
   state = {
     addTodoVisible: false,
+    lists: mockData,
+    user: {},
   };
 
   toggleAddTodoVisible = () => {
@@ -17,7 +19,19 @@ export default class App extends React.Component {
   };
 
   renderTodoList = (todoList) => {
-    return <TodoList list={todoList} />;
+    return <TodoList list={todoList} updateList={this.updateList} />;
+  };
+
+  addList = (list) => {
+    this.setState({
+      lists: [...this.state.lists, { ...list, id: this.state.lists.length + 1, todos: [] }],
+    });
+  };
+
+  updateList = (list) => {
+    this.setState({
+      lists: this.state.lists.map((item) => (item.id === list.id ? list : item)),
+    });
   };
 
   render() {
@@ -28,7 +42,7 @@ export default class App extends React.Component {
           animationType="slide"
           onRequestClose={() => this.toggleAddTodoVisible()}
         >
-          <AddListModal closeModal={() => this.toggleAddTodoVisible()} />
+          <AddListModal closeModal={() => this.toggleAddTodoVisible()} addList={this.addList} />
         </Modal>
         <StatusBar style="auto" />
 
@@ -49,11 +63,12 @@ export default class App extends React.Component {
 
         <View style={{ height: 275, paddingLeft: 32 }}>
           <FlatList
-            data={mockData}
+            data={this.state.lists}
             keyExtractor={(item) => item.name}
             horizontal={true}
             showHorizontalScrollIndicator={false}
             renderItem={({ item }) => this.renderTodoList(item)}
+            keyboardShouldPersistTaps="always"
           />
         </View>
       </View>
