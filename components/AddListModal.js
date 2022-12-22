@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import { Text, StyleSheet, View, KeyboardAvoidingView, TouchableOpacity, TextInput } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import colors from "../Colors";
-import mockData from "../mockData";
-
-const backgroundColors = ["#9AADBF", "#6D98BA", "#D3B99F", "#C17767", "#210203", "#3581B8", "#FCB07E"];
+import colors, { backgroundColors } from "../Colors";
 
 const AddListModal = ({ addList, closeModal }) => {
   const [name, setName] = useState("");
@@ -19,11 +16,10 @@ const AddListModal = ({ addList, closeModal }) => {
       />
     ));
   };
-
   const addTodoList = () => {
     const list = { name, color };
     addList(list);
-    setName("")
+    setName("");
     closeModal();
   };
 
@@ -35,14 +31,8 @@ const AddListModal = ({ addList, closeModal }) => {
 
       <View style={{ alignSelf: "stretch", marginHorizontal: 32 }}>
         <Text style={styles.title}>Create todo list</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="List name?"
-          onChangeText={(text) => setName(text)}
-        />
-        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 12 }}>
-          {renderColors()}
-        </View>
+        <TextInput style={styles.input} placeholder="List name?" onChangeText={(text) => setName(text)} />
+        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 12 }}>{renderColors()}</View>
 
         <TouchableOpacity style={[styles.create, { backgroundColor: color }]} onPress={addTodoList}>
           <Text style={{ color: colors.white, fontWeight: "600" }}>Create</Text>

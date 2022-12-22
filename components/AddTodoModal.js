@@ -24,27 +24,23 @@ const AddTodoModal = ({ list, updateList, closeModal }) => {
     list.todos[index].completed = !list.todos[index].completed;
     updateList(list);
   };
-
   const addTodo = () => {
     list.todos.push({ title: newTodo, completed: false, id: list.todos.length + 1 });
     updateList(list);
     setNewTodo("");
     Keyboard.dismiss();
   };
-
   const deleteTodo = (index) => {
     const newTodoList = list.todos.filter((todo, idx) => idx !== index);
     const newList = { ...list, todos: newTodoList };
     updateList(newList);
   };
-
   const rightActions = (dragX, index) => {
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
       outputRange: [1, 0.9],
       extrapolate: "clamp",
     });
-
     const opacity = dragX.interpolate({
       inputRange: [-100, -20, 0],
       outputRange: [1, 0.9, 0],
