@@ -1,62 +1,56 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { Text, StyleSheet, View, KeyboardAvoidingView, TouchableOpacity, TextInput } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import colors from "../Colors";
 import mockData from "../mockData";
 
-export default class AddListModal extends Component {
-  backgroundColors = ["#9AADBF", "#6D98BA", "#D3B99F", "#C17767", "#210203", "#3581B8", "#FCB07E"];
+const backgroundColors = ["#9AADBF", "#6D98BA", "#D3B99F", "#C17767", "#210203", "#3581B8", "#FCB07E"];
 
-  state = {
-    name: "",
-    color: this.backgroundColors[0],
-  };
+const AddListModal = ({ addList, closeModal }) => {
+  const [name, setName] = useState("");
+  const [color, setColor] = useState(backgroundColors[0]);
 
-  renderColors = () => {
-    return this.backgroundColors.map((color) => (
+  const renderColors = () => {
+    return backgroundColors.map((color) => (
       <TouchableOpacity
         key={color}
         style={[styles.colorSelect, { backgroundColor: color }]}
-        onPress={() => this.setState({ color })}
+        onPress={() => setColor(color)}
       />
     ));
   };
 
-  addTodoList = () => {
-    const { name, color } = this.state;
+  const addTodoList = () => {
     const list = { name, color };
-
-    this.props.addList(list);
-    this.setState({ name: "" });
-    this.props.closeModal();
+    addList(list);
+    setName("")
+    closeModal();
   };
 
-  render() {
-    return (
-      <KeyboardAvoidingView style={styles.container} behavior="padding">
-        <TouchableOpacity style={{ position: "absolute", top: 64, right: 32 }} onPress={this.props.closeModal}>
-          <AntDesign name="close" size={24} color={colors.black} />
-        </TouchableOpacity>
+  return (
+    <KeyboardAvoidingView style={styles.container} behavior="padding">
+      <TouchableOpacity style={{ position: "absolute", top: 64, right: 32 }} onPress={closeModal}>
+        <AntDesign name="close" size={24} color={colors.black} />
+      </TouchableOpacity>
 
-        <View style={{ alignSelf: "stretch", marginHorizontal: 32 }}>
-          <Text style={styles.title}>Create todo list</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="List name?"
-            onChangeText={(text) => this.setState({ name: text })}
-          />
-          <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 12 }}>
-            {this.renderColors()}
-          </View>
-
-          <TouchableOpacity style={[styles.create, { backgroundColor: this.state.color }]} onPress={this.addTodoList}>
-            <Text style={{ color: colors.white, fontWeight: "600" }}>Create</Text>
-          </TouchableOpacity>
+      <View style={{ alignSelf: "stretch", marginHorizontal: 32 }}>
+        <Text style={styles.title}>Create todo list</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="List name?"
+          onChangeText={(text) => setName(text)}
+        />
+        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 12 }}>
+          {renderColors()}
         </View>
-      </KeyboardAvoidingView>
-    );
-  }
-}
+
+        <TouchableOpacity style={[styles.create, { backgroundColor: color }]} onPress={addTodoList}>
+          <Text style={{ color: colors.white, fontWeight: "600" }}>Create</Text>
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -93,3 +87,5 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
 });
+
+export default AddListModal;

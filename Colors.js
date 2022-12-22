@@ -5,4 +5,5 @@ export default colors = {
   pink: "#FF6B6B",
   gray: "#C0C4C2",
   lightGray: "#DFE1E0",
+  red: "#AC3931",
 };
