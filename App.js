@@ -1,35 +1,81 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, TouchableOpacity, FlatList, Modal } from "react-native";
 import TodoList from "./components/TodoList";
 import AddListModal from "./components/AddListModal";
 import { AntDesign } from "@expo/vector-icons";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
+import { collection, getDocs, addDoc } from "firebase/firestore";
+import { db } from "./firebaseConfig";
 import colors from "./Colors";
-import mockData from "./mockData";
 
 const App = () => {
   const [addTodoVisible, setAddTodoVisible] = useState(false);
-  const [lists, setLists] = useState(mockData);
+  const [lists, setLists] = useState([]);
   const [user, setUser] = useState({});
 
   const toggleAddTodoVisible = () => {
     setAddTodoVisible(!addTodoVisible);
   };
-  const addList = (list) => {
-    setLists((prev) => {
-      const newLists = [...prev, { ...list, id: prev.length + 1, todos: [] }];
-      return newLists;
-    });
+  const getLists = async () => {
+    const collectionRef = collection(db, "users/FRyuXyCrcUTYvzd39mQElAhho352/lists");
+    try {
+      const listsSnap = await getDocs(collectionRef);
+      const allLists = [];
+      listsSnap.forEach((list) => {
+        allLists.push({ id: list.id, ...list.data() });
+      });
+      setLists(allLists);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+  const addList = async (list) => {
+    const newList = { ...list, todos: [] };
+    try {
+      const res = await addDoc(collection(db, "users/FRyuXyCrcUTYvzd39mQElAhho352/lists"), newList);
+      getLists();
+    } catch (err) {
+      alert(err.message);
+    }
   };
   const updateList = (list) => {
     setLists((prev) => prev.map((item) => (item.id === list.id ? list : item)));
   };
+  const signIn = () => {
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+      } else {
+        signInAnonymously(auth)
+          .then(({ user }) => {
+            setUser(user);
+          })
+          .catch((error) => {
+            if (error) {
+              alert("Oh no, something went wrong");
+            }
+          });
+      }
+    });
+  };
+
+  useEffect(() => {
+    if (user) {
+      getLists();
+    }
+    signIn();
+  }, []);
 
   return (
     <View style={styles.container}>
       <Modal visible={addTodoVisible} animationType="slide" onRequestClose={() => toggleAddTodoVisible()}>
         <AddListModal closeModal={() => toggleAddTodoVisible()} addList={addList} />
       </Modal>
+      <View>
+        <Text>User: {user.uid}</Text>
+      </View>
       <StatusBar style="auto" />
 
       <View style={{ flexDirection: "row" }}>
