@@ -1,13 +1,14 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import Constants from 'expo-constants';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCwSYyLt2_brOl6C8thxkkpsi3eQ3wpKsA",
-  authDomain: "todoapp-ios-902d1.firebaseapp.com",
-  projectId: "todoapp-ios-902d1",
-  storageBucket: "todoapp-ios-902d1.appspot.com",
-  messagingSenderId: "334138645318",
-  appId: "1:334138645318:web:5a14c0acbbcdc13865e347",
+  apiKey: Constants.expoConfig.extra.apiKey,
+  authDomain: Constants.expoConfig.extra.authDomain,
+  projectId: Constants.expoConfig.extra.projectId,
+  storageBucket: Constants.expoConfig.extra.storageBucket,
+  messagingSenderId: Constants.expoConfig.extra.messagingSenderId,
+  appId: Constants.expoConfig.extra.appId,
 };
 
 const app = initializeApp(firebaseConfig);
