@@ -1,10 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, Modal, ActivityIndicator, TextInput } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  FlatList,
+  Modal,
+  ActivityIndicator,
+  TextInput,
+  KeyboardAvoidingView,
+  SafeAreaView,
+  LogBox,
+} from "react-native";
 import TodoList from "./components/TodoList";
 import AddListModal from "./components/AddListModal";
 import { AntDesign } from "@expo/vector-icons";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { collection, getDocs, addDoc, updateDoc, doc } from "firebase/firestore";
 import { db } from "./firebaseConfig";
 import colors from "./Colors";
@@ -70,23 +81,17 @@ const App = () => {
     } catch (error) {
       alert(error.message);
     }
-    // onAuthStateChanged(auth, (user) => {
-    //   if (user) {
-    //     setUser(user);
-    //     setUserLoading(false);
-    //   } else {
-    //     signInAnonymously(auth)
-    //       .then(({ user }) => {
-    //         setUser(user);
-    //         setUserLoading(false);
-    //       })
-    //       .catch((error) => {
-    //         if (error) {
-    //           alert("Oh no, something went wrong");
-    //         }
-    //       });
-    //   }
-    // });
+  };
+  const signUp = async () => {
+    const auth = getAuth();
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      setUser(user);
+      closeLoginModal();
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   useEffect(() => {
@@ -95,26 +100,60 @@ const App = () => {
     }
   }, [user]);
 
+  LogBox.ignoreLogs([
+    "AsyncStorage has been extracted from react-native core and will be removed in a future release. " +
+      "It can now be installed and imported from '@react-native-async-storage/async-storage' instead of 'react-native'. " +
+      "See https://github.com/react-native-async-storage/async-storage",
+  ]);
+
   return !user ? (
-    <View style={styles.container}>
-      <Modal visible={loginModalVisible} animationType="slide" onRequestClose={() => closeLoginModal()}>
-        <TextInput
-          style={[styles.input, { borderColor: colors.pink }]}
-          placeholder="Email"
-          onChangeText={(text) => setEmail(text)}
-          value={email}
-          autoCapitalize="none"
-        />
-        <TextInput
-          style={[styles.input, { borderColor: colors.pink }]}
-          placeholder="Password"
-          onChangeText={(text) => setPassword(text)}
-          value={password}
-          textContentType="password"
-        />
-        <TouchableOpacity style={styles.addList} onPress={() => signIn()}>
-          <AntDesign name="plus" size={16} color={colors.pink} />
-        </TouchableOpacity>
+    <View style={[styles.container, { marginTop: 22 }]}>
+      <Modal
+        visible={loginModalVisible}
+        animationType="slide"
+        onRequestClose={() => closeLoginModal()}
+        transparent={true}
+      >
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+          <SafeAreaView style={[styles.container, { marginTop: 22 }]}>
+            <View style={styles.modalView}>
+              <Text style={{ fontSize: 20, marginBottom: 22 }}>
+                Todo <Text style={{ fontWeight: "300", color: colors.pink }}>App</Text>
+              </Text>
+              <TextInput
+                style={[styles.input, { borderColor: colors.pink }]}
+                placeholder="Email"
+                onChangeText={(text) => setEmail(text)}
+                value={email}
+                autoCapitalize="none"
+              />
+              <TextInput
+                style={[styles.input, { borderColor: colors.pink }]}
+                placeholder="Password"
+                onChangeText={(text) => setPassword(text)}
+                value={password}
+                textContentType="password"
+                secureTextEntry={true}
+              />
+              <View style={{ flexDirection: "row" }}>
+                <TouchableOpacity
+                  style={[styles.addList, { borderRadius: 50, marginRight: 20 }]}
+                  onPress={() => signIn()}
+                  disabled={!email || !password}
+                >
+                  <Text>Login</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.addList, { borderRadius: 50 }]}
+                  onPress={() => signUp()}
+                  disabled={!email || !password}
+                >
+                  <Text>Sign up</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </SafeAreaView>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   ) : listsLoading ? (
@@ -123,13 +162,12 @@ const App = () => {
     </View>
   ) : (
     <View style={styles.container}>
+      <View>
+        <Text style={styles.userEmail}>{user.email}</Text>
+      </View>
       <Modal visible={addTodoVisible} animationType="slide" onRequestClose={() => toggleAddTodoVisible()}>
         <AddListModal closeModal={() => toggleAddTodoVisible()} addList={addList} />
       </Modal>
-      <View>
-        <Text>User: {user.email}</Text>
-      </View>
-      <StatusBar style="auto" />
 
       <View style={{ flexDirection: "row" }}>
         <View style={styles.divider} />
@@ -194,12 +232,32 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   input: {
-    flex: 1,
     height: 48,
+    width: 300,
     borderWidth: StyleSheet.hairlineWidth,
     borderRadius: 6,
-    marginRight: 8,
-    paddingHorizontal: 8,
+    padding: 10,
+    marginBottom: 20,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  userEmail: {
+    marginBottom: 20,
+    fontSize: 15,
+    fontWeight: "600",
   },
 });
 

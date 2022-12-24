@@ -34,7 +34,7 @@ const AddListModal = ({ addList, closeModal }) => {
         <TextInput style={styles.input} placeholder="List name?" onChangeText={(text) => setName(text)} />
         <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 12 }}>{renderColors()}</View>
 
-        <TouchableOpacity style={[styles.create, { backgroundColor: color }]} onPress={addTodoList}>
+        <TouchableOpacity style={[styles.create, { backgroundColor: color }]} onPress={addTodoList} disabled={!name}>
           <Text style={{ color: colors.white, fontWeight: "600" }}>Create</Text>
         </TouchableOpacity>
       </View>

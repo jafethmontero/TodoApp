@@ -35,7 +35,7 @@ const AddTodoModal = ({ list, updateList, closeModal }) => {
     const newTodoList = list.todos.filter((todo, idx) => idx !== index);
     const newList = { ...list, todos: newTodoList };
     updateList(newList);
-    swipeableRef.current?.[index].close()
+    swipeableRef.current?.[index].close();
   };
   const rightActions = (dragX, index) => {
     const scale = dragX.interpolate({
@@ -124,7 +124,11 @@ const AddTodoModal = ({ list, updateList, closeModal }) => {
             onChangeText={(text) => setNewTodo(text)}
             value={newTodo}
           />
-          <TouchableOpacity style={[styles.addTodo, { backgroundColor: list.color }]} onPress={addTodo}>
+          <TouchableOpacity
+            style={[styles.addTodo, { backgroundColor: list.color }]}
+            onPress={addTodo}
+            disabled={!newTodo}
+          >
             <AntDesign name="plus" size={16} color={colors.white} />
           </TouchableOpacity>
         </View>
