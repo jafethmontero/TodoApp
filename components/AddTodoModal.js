@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Text,
   StyleSheet,
@@ -17,6 +17,7 @@ import colors from "../Colors";
 
 const AddTodoModal = ({ list, updateList, closeModal }) => {
   const [newTodo, setNewTodo] = useState("");
+  const swipeableRef = useRef([]);
   const taskCount = list.todos.length;
   const completedCount = list.todos.filter((todo) => todo.completed).length;
 
@@ -25,7 +26,7 @@ const AddTodoModal = ({ list, updateList, closeModal }) => {
     updateList(list);
   };
   const addTodo = () => {
-    list.todos.push({ title: newTodo, completed: false, id: list.todos.length + 1 });
+    list.todos.push({ title: newTodo, completed: false });
     updateList(list);
     setNewTodo("");
     Keyboard.dismiss();
@@ -34,6 +35,7 @@ const AddTodoModal = ({ list, updateList, closeModal }) => {
     const newTodoList = list.todos.filter((todo, idx) => idx !== index);
     const newList = { ...list, todos: newTodoList };
     updateList(newList);
+    swipeableRef.current?.[index].close()
   };
   const rightActions = (dragX, index) => {
     const scale = dragX.interpolate({
@@ -59,7 +61,14 @@ const AddTodoModal = ({ list, updateList, closeModal }) => {
   };
 
   const renderTodos = (todo, index) => (
-    <Swipeable renderRightActions={(_, dragX) => rightActions(dragX, index)}>
+    <Swipeable
+      renderRightActions={(_, dragX) => rightActions(dragX, index)}
+      ref={(ref) => {
+        if (ref) {
+          swipeableRef.current.push(ref);
+        }
+      }}
+    >
       <View style={styles.todoContainer}>
         <TouchableOpacity onPress={() => toggleTodoCompleted(index)}>
           <Ionicons

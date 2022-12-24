@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, Modal } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, Modal, ActivityIndicator } from "react-native";
 import TodoList from "./components/TodoList";
 import AddListModal from "./components/AddListModal";
 import { AntDesign } from "@expo/vector-icons";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
-import { collection, getDocs, addDoc } from "firebase/firestore";
+import { collection, getDocs, addDoc, updateDoc, doc } from "firebase/firestore";
 import { db } from "./firebaseConfig";
 import colors from "./Colors";
 
@@ -13,12 +13,14 @@ const App = () => {
   const [addTodoVisible, setAddTodoVisible] = useState(false);
   const [lists, setLists] = useState([]);
   const [user, setUser] = useState({});
+  const [userLoading, setUserLoading] = useState(true);
+  const [listsLoading, setListsLoading] = useState(true);
 
   const toggleAddTodoVisible = () => {
     setAddTodoVisible(!addTodoVisible);
   };
   const getLists = async () => {
-    const collectionRef = collection(db, "users/FRyuXyCrcUTYvzd39mQElAhho352/lists");
+    const collectionRef = collection(db, `users/${user.uid}/lists`);
     try {
       const listsSnap = await getDocs(collectionRef);
       const allLists = [];
@@ -26,6 +28,7 @@ const App = () => {
         allLists.push({ id: list.id, ...list.data() });
       });
       setLists(allLists);
+      setListsLoading(false);
     } catch (err) {
       alert(err.message);
     }
@@ -33,24 +36,36 @@ const App = () => {
   const addList = async (list) => {
     const newList = { ...list, todos: [] };
     try {
-      const res = await addDoc(collection(db, "users/FRyuXyCrcUTYvzd39mQElAhho352/lists"), newList);
-      getLists();
+      const doc = await addDoc(collection(db, `users/${user.uid}/lists`), newList);
+      setLists((prev) => {
+        return [...prev, { id: doc.id, ...newList }];
+      });
     } catch (err) {
       alert(err.message);
     }
   };
-  const updateList = (list) => {
-    setLists((prev) => prev.map((item) => (item.id === list.id ? list : item)));
+  const updateList = async (list) => {
+    const { name, color, todos } = list;
+    const updatedList = { name, color, todos };
+    const listRef = doc(db, `users/${user.uid}/lists/${list.id}`);
+    try {
+      await updateDoc(listRef, updatedList);
+      setLists((prev) => prev.map((item) => (item.id === list.id ? list : item)));
+    } catch (error) {
+      alert(error.message);
+    }
   };
   const signIn = () => {
     const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setUser(user);
+        setUserLoading(false);
       } else {
         signInAnonymously(auth)
           .then(({ user }) => {
             setUser(user);
+            setUserLoading(false);
           })
           .catch((error) => {
             if (error) {
@@ -66,9 +81,13 @@ const App = () => {
       getLists();
     }
     signIn();
-  }, []);
+  }, [user]);
 
-  return (
+  return userLoading || listsLoading ? (
+    <View style={styles.container}>
+      <ActivityIndicator size="large" color={colors.turq} />
+    </View>
+  ) : (
     <View style={styles.container}>
       <Modal visible={addTodoVisible} animationType="slide" onRequestClose={() => toggleAddTodoVisible()}>
         <AddListModal closeModal={() => toggleAddTodoVisible()} addList={addList} />
