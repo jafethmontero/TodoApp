@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, Modal, TouchableOpacity, FlatList, ActivityIndicator } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { UserContext } from "../App";
 import AddListModal from "../components/AddListModal";
 import TodoList from "../components/TodoList";
 import { db } from "../firebaseConfig";
@@ -13,7 +12,8 @@ const HomeScreen = () => {
   const [addTodoVisible, setAddTodoVisible] = useState(false);
   const [lists, setLists] = useState([]);
   const [listsLoading, setListsLoading] = useState(true);
-  const user = useContext(UserContext);
+  const auth = getAuth();
+  const user = auth.currentUser;
 
   const toggleAddTodoVisible = () => {
     setAddTodoVisible(!addTodoVisible);

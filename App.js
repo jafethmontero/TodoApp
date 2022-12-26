@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext } from "react";
+import React, { useState, useEffect } from "react";
 import { LogBox } from "react-native";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { NavigationContainer } from "@react-navigation/native";
@@ -9,7 +9,6 @@ import HomeScreen from "./screens/HomeScreen";
 import LoadingScreen from "./screens/LoadingScreen";
 
 const Stack = createNativeStackNavigator();
-export const UserContext = createContext({});
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -35,24 +34,22 @@ const App = () => {
   }, []);
 
   return (
-    <UserContext.Provider value={user}>
-      <NavigationContainer>
-        <Stack.Navigator>
-          {loading ? (
-            <Stack.Screen name="Loading" component={LoadingScreen} />
-          ) : !user ? (
-            <Stack.Group screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="Login" component={LoginScreen} />
-              <Stack.Screen name="Signup" component={SignupScreen} />
-            </Stack.Group>
-          ) : (
-            <Stack.Group>
-              <Stack.Screen name="Home" component={HomeScreen} />
-            </Stack.Group>
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
-    </UserContext.Provider>
+    <NavigationContainer>
+      <Stack.Navigator>
+        {loading ? (
+          <Stack.Screen name="Loading" component={LoadingScreen} />
+        ) : !user ? (
+          <Stack.Group screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Signup" component={SignupScreen} />
+          </Stack.Group>
+        ) : (
+          <Stack.Group>
+            <Stack.Screen name="Home" component={HomeScreen} />
+          </Stack.Group>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 
