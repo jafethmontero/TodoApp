@@ -7,6 +7,7 @@ const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
 
   const signUp = async () => {
     const auth = getAuth();
@@ -17,7 +18,7 @@ const LoginScreen = ({ navigation }) => {
       });
       navigation.navigate("Home");
     } catch (error) {
-      alert(error.message);
+      setError(error.message);
     }
   };
 
@@ -29,6 +30,7 @@ const LoginScreen = ({ navigation }) => {
             <Text style={{ fontSize: 20, marginBottom: 22 }}>
               Todo <Text style={{ fontWeight: "300", color: colors.pink }}>App</Text>
             </Text>
+            {error ? <Text style={{ color: colors.red, marginBottom: 20 }}>{error}</Text> : null}
             <TextInput
               style={[styles.input, { borderColor: colors.pink }]}
               placeholder="User Name"
