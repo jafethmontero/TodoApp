@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Modal } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
 import colors from "../Colors";
 import AddTodoModal from "./AddTodoModal";
 
-const TodoList = ({ list, updateList }) => {
+const TodoList = ({ list, updateList, deleteList }) => {
   const [addTodoModalVisible, setAddTodoModalVisible] = useState(false);
   const completedCount = list.todos.filter((todo) => todo.completed).length;
   const remainingCount = list.todos.length - completedCount;
@@ -14,21 +15,19 @@ const TodoList = ({ list, updateList }) => {
 
   return (
     <View>
-      <Modal
-        visible={addTodoModalVisible}
-        animationType="slide"
-        onRequestClose={() => toggleAddTodoModalVisible()}
-      >
-        <AddTodoModal
-          list={list}
-          closeModal={() => toggleAddTodoModalVisible()}
-          updateList={updateList}
-        />
+      <Modal visible={addTodoModalVisible} animationType="slide" onRequestClose={() => toggleAddTodoModalVisible()}>
+        <AddTodoModal list={list} closeModal={() => toggleAddTodoModalVisible()} updateList={updateList} />
       </Modal>
       <TouchableOpacity
         style={[styles.listContainer, { backgroundColor: list.color }]}
         onPress={() => toggleAddTodoModalVisible()}
       >
+        <TouchableOpacity
+          style={{ position: "absolute", top: 15, right: 15, zIndex: 10 }}
+          onPress={() => deleteList(list)}
+        >
+          <AntDesign name="close" size={24} color={colors.white} />
+        </TouchableOpacity>
         <Text style={styles.listTitle} numberOfLines={1}>
           {list.name}
         </Text>

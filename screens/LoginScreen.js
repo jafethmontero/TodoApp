@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, KeyboardAvoidingView, SafeAreaView } from "react-native";
 import React, { useState } from "react";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import colors from "../Colors";
 
 const LoginScreen = ({ navigation }) => {
@@ -9,10 +10,8 @@ const LoginScreen = ({ navigation }) => {
   const signIn = async () => {
     const auth = getAuth();
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      setUser(user);
-      closeLoginModal();
+      await signInWithEmailAndPassword(auth, email, password);
+      navigation.navigate("Home");
     } catch (error) {
       alert(error.message);
     }
@@ -21,7 +20,7 @@ const LoginScreen = ({ navigation }) => {
     <View style={[styles.container, { marginTop: 22 }]}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
         <SafeAreaView style={[styles.container, { marginTop: 22 }]}>
-          <View style={styles.modalView}>
+          <View style={{ alignItems: "center" }}>
             <Text style={{ fontSize: 20, marginBottom: 22 }}>
               Todo <Text style={{ fontWeight: "300", color: colors.pink }}>App</Text>
             </Text>
@@ -40,16 +39,12 @@ const LoginScreen = ({ navigation }) => {
               textContentType="password"
               secureTextEntry={true}
             />
-            <TouchableOpacity
-              style={[styles.addList, { borderRadius: 50, marginRight: 20 }]}
-              onPress={() => signIn()}
-              disabled={!email || !password}
-            >
-              <Text>Login</Text>
+            <TouchableOpacity style={styles.login} onPress={() => signIn()} disabled={!email || !password}>
+              <Text style={{ color: colors.white, fontWeight: "700" }}>Login</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate("Signup")}>
-              <Text>
-                New to TodoApp <Text>Sign Up</Text>
+              <Text style={{ marginTop: 10 }}>
+                New? <Text style={{ color: colors.pink }}>Sign Up</Text>
               </Text>
             </TouchableOpacity>
           </View>
@@ -68,31 +63,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  divider: {
+  login: {
     backgroundColor: colors.turq,
-    height: 1,
-    flex: 1,
-    alignSelf: "center",
-  },
-  title: {
-    fontSize: 38,
-    fontWeight: "800",
-    color: colors.black,
-    paddingHorizontal: 64,
-  },
-  addList: {
-    borderWidth: 2,
-    borderColor: colors.turq,
     borderRadius: 4,
-    padding: 16,
+    padding: 10,
     alignItems: "center",
     justifyContent: "center",
-  },
-  add: {
-    color: colors.pink,
-    fontWeight: "600",
-    fontSize: 14,
-    marginTop: 8,
+    height: 48,
+    width: 300,
+    marginBottom: 20,
   },
   input: {
     height: 48,
@@ -101,25 +80,5 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 10,
     marginBottom: 20,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  userEmail: {
-    marginBottom: 20,
-    fontSize: 15,
-    fontWeight: "600",
   },
 });

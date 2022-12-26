@@ -1,30 +1,40 @@
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, KeyboardAvoidingView, SafeAreaView } from "react-native";
 import React, { useState } from "react";
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import colors from "../Colors";
 
-const LoginScreen = () => {
+const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
+  const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
 
   const signUp = async () => {
     const auth = getAuth();
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      setUser(user);
-      closeLoginModal();
+      updateProfile(userCredential.user, {
+        displayName: userName,
+      });
+      navigation.navigate("Home");
     } catch (error) {
       alert(error.message);
     }
   };
+
   return (
     <View style={[styles.container, { marginTop: 22 }]}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
         <SafeAreaView style={[styles.container, { marginTop: 22 }]}>
-          <View style={styles.modalView}>
+          <View style={{ alignItems: "center" }}>
             <Text style={{ fontSize: 20, marginBottom: 22 }}>
               Todo <Text style={{ fontWeight: "300", color: colors.pink }}>App</Text>
             </Text>
+            <TextInput
+              style={[styles.input, { borderColor: colors.pink }]}
+              placeholder="User Name"
+              onChangeText={(text) => setUserName(text)}
+              value={userName}
+            />
             <TextInput
               style={[styles.input, { borderColor: colors.pink }]}
               placeholder="Email"
@@ -40,12 +50,13 @@ const LoginScreen = () => {
               textContentType="password"
               secureTextEntry={true}
             />
-            <TouchableOpacity
-              style={[styles.addList, { borderRadius: 50 }]}
-              onPress={() => signUp()}
-              disabled={!email || !password}
-            >
-              <Text>Sign up</Text>
+            <TouchableOpacity style={styles.login} onPress={() => signUp()} disabled={!email || !password}>
+              <Text style={{ color: colors.white, fontWeight: "700" }}>Sign up</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Text style={{ marginTop: 10 }}>
+                Have an acount already? <Text style={{ color: colors.pink }}>Login</Text>
+              </Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -63,31 +74,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  divider: {
+  login: {
     backgroundColor: colors.turq,
-    height: 1,
-    flex: 1,
-    alignSelf: "center",
-  },
-  title: {
-    fontSize: 38,
-    fontWeight: "800",
-    color: colors.black,
-    paddingHorizontal: 64,
-  },
-  addList: {
-    borderWidth: 2,
-    borderColor: colors.turq,
     borderRadius: 4,
-    padding: 16,
+    padding: 10,
     alignItems: "center",
     justifyContent: "center",
-  },
-  add: {
-    color: colors.pink,
-    fontWeight: "600",
-    fontSize: 14,
-    marginTop: 8,
+    height: 48,
+    width: 300,
+    marginBottom: 20,
   },
   input: {
     height: 48,
@@ -96,25 +91,5 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 10,
     marginBottom: 20,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  userEmail: {
-    marginBottom: 20,
-    fontSize: 15,
-    fontWeight: "600",
   },
 });

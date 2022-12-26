@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import { StyleSheet, Text, View, Modal, TouchableOpacity, FlatList, ActivityIndicator } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { collection, getDocs, addDoc, doc, updateDoc } from "firebase/firestore";
+import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 import { UserContext } from "../App";
 import AddListModal from "../components/AddListModal";
 import TodoList from "../components/TodoList";
@@ -53,6 +54,22 @@ const HomeScreen = () => {
       alert(error.message);
     }
   };
+  const signOut = () => {
+    const auth = getAuth();
+    auth.signOut();
+  };
+  const deleteList = async (list) => {
+    const listRef = doc(db, `users/${user.uid}/lists/${list.id}`);
+    try {
+      await deleteDoc(listRef);
+      setLists((prev) => {
+        const newList = prev.filter((item) => item.id !== list.id);
+        return newList;
+      });
+    } catch (error) {
+      alert(error.message);
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -62,8 +79,11 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View>
-        <Text style={styles.userEmail}>{user.email}</Text>
+      <View style={{ justifyContent: "center", alignItems: "center", position: "relative", top: -110 }}>
+        <Text style={styles.userDisplayName}>{user.displayName}</Text>
+        <TouchableOpacity onPress={() => signOut()}>
+          <Text style={{ fontWeight: "600", color: colors.pink }}>Sign out</Text>
+        </TouchableOpacity>
       </View>
       <Modal visible={addTodoVisible} animationType="slide" onRequestClose={() => toggleAddTodoVisible()}>
         <AddListModal closeModal={() => toggleAddTodoVisible()} addList={addList} />
@@ -93,7 +113,7 @@ const HomeScreen = () => {
             keyExtractor={(item) => item.id}
             horizontal={true}
             showHorizontalScrollIndicator={false}
-            renderItem={({ item }) => <TodoList list={item} updateList={updateList} />}
+            renderItem={({ item }) => <TodoList list={item} updateList={updateList} deleteList={deleteList} />}
             keyboardShouldPersistTaps="always"
           />
         )}
@@ -137,8 +157,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 8,
   },
-  userEmail: {
-    marginBottom: 20,
+  userDisplayName: {
+    marginBottom: 10,
     fontSize: 15,
     fontWeight: "600",
   },

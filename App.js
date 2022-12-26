@@ -14,9 +14,16 @@ export const UserContext = createContext({});
 const App = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const auth = getAuth();
 
-  const userWatcher = () => {
-    const auth = getAuth();
+  LogBox.ignoreLogs([
+    "async-storage-moved",
+    "AsyncStorage has been extracted from react-native core and will be removed in a future release. " +
+      "It can now be installed and imported from '@react-native-async-storage/async-storage' instead of 'react-native'. " +
+      "See https://github.com/react-native-async-storage/async-storage",
+  ]);
+
+  useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setUser(user);
@@ -25,16 +32,6 @@ const App = () => {
       }
       setLoading(false);
     });
-  };
-
-  LogBox.ignoreLogs([
-    "AsyncStorage has been extracted from react-native core and will be removed in a future release. " +
-      "It can now be installed and imported from '@react-native-async-storage/async-storage' instead of 'react-native'. " +
-      "See https://github.com/reactimport HomeScreen from './screens/HomeScreen'‰-native-async-storage/async-storage",
-  ]);
-
-  useEffect(() => {
-    userWatcher();
   }, []);
 
   return (
@@ -44,7 +41,7 @@ const App = () => {
           {loading ? (
             <Stack.Screen name="Loading" component={LoadingScreen} />
           ) : !user ? (
-            <Stack.Group>
+            <Stack.Group screenOptions={{ headerShown: false }}>
               <Stack.Screen name="Login" component={LoginScreen} />
               <Stack.Screen name="Signup" component={SignupScreen} />
             </Stack.Group>
