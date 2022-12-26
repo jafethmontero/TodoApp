@@ -44,7 +44,7 @@ const App = () => {
             <Stack.Screen name="Signup" component={SignupScreen} />
           </Stack.Group>
         ) : (
-          <Stack.Group>
+          <Stack.Group screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Home" component={HomeScreen} />
           </Stack.Group>
         )}
