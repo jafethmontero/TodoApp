@@ -82,7 +82,7 @@ const HomeScreen = () => {
       <View style={{ justifyContent: "center", alignItems: "center", position: "relative", top: -110 }}>
         <Text style={styles.userDisplayName}>{user.displayName}</Text>
         <TouchableOpacity onPress={() => signOut()}>
-          <Text style={{ fontWeight: "600", color: colors.pink }}>Sign out</Text>
+          <Text style={{ fontWeight: "600", color: colors.pink }}>Log out</Text>
         </TouchableOpacity>
       </View>
       <Modal visible={addTodoVisible} animationType="slide" onRequestClose={() => toggleAddTodoVisible()}>
