@@ -79,7 +79,7 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={{ justifyContent: "center", alignItems: "center", position: "relative", top: -110 }}>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%", position: "absolute", top: 50, paddingHorizontal: 10}}>
         <Text style={styles.userDisplayName}>{user.displayName}</Text>
         <TouchableOpacity onPress={() => signOut()}>
           <Text style={{ fontWeight: "600", color: colors.pink }}>Log out</Text>
@@ -158,7 +158,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   userDisplayName: {
-    marginBottom: 10,
     fontSize: 15,
     fontWeight: "600",
   },
